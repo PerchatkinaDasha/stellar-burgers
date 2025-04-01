@@ -20,26 +20,13 @@ const initialState: TInitialState = {
 // Асинхронный экшен для получения всех фидов (заказов)
 export const getFeeds = createAsyncThunk(
   'feeds/getFeeds',
-  async (_, thunkAPI) => {
-    try {
-      return thunkAPI.fulfillWithValue(await getFeedsApi()); // Запрос данных и возврат результата
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error); // В случае ошибки передаем ее в стейт
-    }
-  }
+  async () => await getFeedsApi()
 );
 
 // Асинхронный экшен для получения заказа по его ID
 export const getFeedById = createAsyncThunk(
   'feeds/getFeed',
-  async (id: number, thunkAPI) => {
-    try {
-      const data = await getOrderByNumberApi(id); // Получаем данные по ID
-      return thunkAPI.fulfillWithValue(data.orders[0]); // Возвращаем первый найденный заказ
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error); // В случае ошибки передаем ее в стейт
-    }
-  }
+  async (id: number) => (await getOrderByNumberApi(id)).orders[0]
 );
 
 const feedsSlice = createSlice({
@@ -59,7 +46,7 @@ const feedsSlice = createSlice({
       })
       .addCase(getFeeds.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || 'Ошибка загрузки';
       })
 
       // Обработка запроса заказа по ID
@@ -74,7 +61,7 @@ const feedsSlice = createSlice({
       })
       .addCase(getFeedById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || 'Ошибка загрузки';
       });
   }
 });
