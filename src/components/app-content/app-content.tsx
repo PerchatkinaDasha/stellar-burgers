@@ -31,22 +31,25 @@ export const AppContent = () => {
   const location = useLocation();
   const background = location.state?.background;
 
+  // Определяем номер заказа, если он есть в маршруте профиля или ленты
   const profileMatch = useMatch('/profile/orders/:number')?.params.number;
   const feedMatch = useMatch('/feed/:number')?.params.number;
   const orderNumber = profileMatch || feedMatch;
 
+  // Проверяем, аутентифицирован ли пользователь
   const isAuthenticated = !!getCookie('accessToken');
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (getCookie('accessToken')) dispatch(getUser());
-    dispatch(getIngredients());
+    if (getCookie('accessToken')) dispatch(getUser()); // Загружаем данные пользователя
+    dispatch(getIngredients()); // Загружаем список ингредиентов
   }, [dispatch]);
 
-  const handleBack = () => navigate(-1);
+  const handleBack = () => navigate(-1); // Функция для закрытия модального окна
 
   return (
     <>
+      {/* Основные маршруты */}
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
@@ -99,7 +102,7 @@ export const AppContent = () => {
           }
         />
 
-        {/* Исправленный маршрут деталей ингредиента */}
+        {/* Страница деталей ингредиента */}
         <Route
           path='/ingredients/:id'
           element={
@@ -112,6 +115,7 @@ export const AppContent = () => {
           }
         />
 
+        {/* Страница заказа из ленты */}
         <Route
           path='/feed/:number'
           element={
@@ -123,6 +127,8 @@ export const AppContent = () => {
             </div>
           }
         />
+
+        {/* Страница заказа из профиля */}
         <Route
           path='/profile/orders/:number'
           element={
@@ -137,9 +143,11 @@ export const AppContent = () => {
           }
         />
 
+        {/* Страница 404 - не найдено */}
         <Route path='*' element={<NotFound404 />} />
       </Routes>
 
+      {/* Модальные окна для деталей заказов и ингредиентов */}
       {background && (
         <Routes>
           <Route
