@@ -11,18 +11,29 @@ import {
   ResetPassword
 } from '@pages';
 import '../../index.css';
+import './app-content.css';
 
 import { IngredientDetails, Modal, OrderInfo } from '@components';
 import { getIngredients, getUser } from '@slices';
 import { useEffect } from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Route,
+  Routes,
+  useLocation,
+  useMatch,
+  useNavigate
+} from 'react-router-dom';
 import { useDispatch } from '../../services/store';
 import { getCookie } from '../../utils/cookie';
 
 export const AppContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const background = location.state?.background; // Проверяем, есть ли background
+  const background = location.state?.background;
+
+  const profileMatch = useMatch('/profile/orders/:number')?.params.number;
+  const feedMatch = useMatch('/feed/:number')?.params.number;
+  const orderNumber = profileMatch || feedMatch;
 
   const isAuthenticated = !!getCookie('accessToken');
   const dispatch = useDispatch();
@@ -36,7 +47,6 @@ export const AppContent = () => {
 
   return (
     <>
-      {/* Основные маршруты (страницы) */}
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
@@ -89,23 +99,56 @@ export const AppContent = () => {
           }
         />
 
-        {/* Добавляем отображение деталей ингредиента на отдельной странице */}
-        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+        {/* Исправленный маршрут деталей ингредиента */}
+        <Route
+          path='/ingredients/:id'
+          element={
+            <div className='detailPageWrap'>
+              <p className='text text_type_main-large detailHeader'>
+                Детали ингредиента
+              </p>
+              <IngredientDetails />
+            </div>
+          }
+        />
 
-        {/* Добавляем отображение деталей заказа на отдельной странице */}
-        <Route path='/feed/:number' element={<OrderInfo />} />
-        <Route path='/profile/orders/:number' element={<OrderInfo />} />
+        <Route
+          path='/feed/:number'
+          element={
+            <div className='detailPageWrap'>
+              <p className='text text_type_digits-default detailHeader'>
+                #{orderNumber && orderNumber.padStart(6, '0')}
+              </p>
+              <OrderInfo />
+            </div>
+          }
+        />
+        <Route
+          path='/profile/orders/:number'
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <div className='detailPageWrap'>
+                <p className='text text_type_digits-default detailHeader'>
+                  #{orderNumber && orderNumber.padStart(6, '0')}
+                </p>
+                <OrderInfo />
+              </div>
+            </ProtectedPage>
+          }
+        />
 
         <Route path='*' element={<NotFound404 />} />
       </Routes>
 
-      {/* Маршруты для модальных окон */}
       {background && (
         <Routes>
           <Route
             path='/feed/:number'
             element={
-              <Modal title={''} onClose={handleBack}>
+              <Modal
+                title={`#${orderNumber?.padStart(6, '0')}`}
+                onClose={handleBack}
+              >
                 <OrderInfo />
               </Modal>
             }
@@ -113,7 +156,7 @@ export const AppContent = () => {
           <Route
             path='/ingredients/:id'
             element={
-              <Modal title={''} onClose={handleBack}>
+              <Modal title={'Детали ингредиента'} onClose={handleBack}>
                 <IngredientDetails />
               </Modal>
             }
@@ -121,7 +164,10 @@ export const AppContent = () => {
           <Route
             path='/profile/orders/:number'
             element={
-              <Modal title={''} onClose={handleBack}>
+              <Modal
+                title={`#${orderNumber?.padStart(6, '0')}`}
+                onClose={handleBack}
+              >
                 <OrderInfo />
               </Modal>
             }
