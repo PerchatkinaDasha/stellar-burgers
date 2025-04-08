@@ -3,7 +3,7 @@ import React, { FC, memo } from 'react';
 import styles from './feed-info.module.css';
 
 import { FeedInfoUIProps, HalfColumnProps, TColumnProps } from './type';
-// Компонент UI для отображения информации о ленте заказов
+
 export const FeedInfoUI: FC<FeedInfoUIProps> = memo(
   ({ feed, readyOrders, pendingOrders }) => {
     const { total, totalToday } = feed;
@@ -24,7 +24,7 @@ export const FeedInfoUI: FC<FeedInfoUIProps> = memo(
     );
   }
 );
-// Компонент для отображения половины колонки с заказами
+
 const HalfColumn: FC<HalfColumnProps> = ({ orders, title, textColor }) => (
   <div className={`pr-6 ${styles.column}`}>
     <h3 className={`text text_type_main-medium ${styles.title}`}>{title}:</h3>
@@ -41,7 +41,7 @@ const HalfColumn: FC<HalfColumnProps> = ({ orders, title, textColor }) => (
     </ul>
   </div>
 );
-// Компонент для отображения информации о количестве заказов
+
 const Column: FC<TColumnProps> = ({ title, content }) => (
   <>
     <h3 className={`pt-15 text text_type_main-medium ${styles.title}`}>

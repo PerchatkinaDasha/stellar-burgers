@@ -5,7 +5,7 @@ import { getFeedsApi, getOrderByNumberApi } from '@api';
 
 jest.mock('@api', () => ({
   getFeedsApi: jest.fn(),
-  getOrderByNumberApi: jest.fn(),
+  getOrderByNumberApi: jest.fn()
 }));
 
 describe('feed-slice', () => {
@@ -14,8 +14,8 @@ describe('feed-slice', () => {
   beforeEach(() => {
     store = configureStore({
       reducer: {
-        feeds: feedReducer,
-      },
+        feeds: feedReducer
+      }
     });
   });
 
@@ -30,11 +30,11 @@ describe('feed-slice', () => {
             name: 'burger1',
             createdAt: '2024-10-01T00:00:00Z',
             updatedAt: '2024-10-01T01:00:00Z',
-            ingredients: ['1', '2', '3'],
-          },
+            ingredients: ['1', '2', '3']
+          }
         ],
         total: 1,
-        totalToday: 1,
+        totalToday: 1
       };
 
       (getFeedsApi as jest.Mock).mockResolvedValue(mockFeedsData);
@@ -60,7 +60,7 @@ describe('feed-slice', () => {
       const state = store.getState() as RootState;
       const feedsState = state.feeds;
       expect(feedsState.loading).toBe(false);
-      expect(feedsState.error).toBe(errorMessage); 
+      expect(feedsState.error).toBe(errorMessage);
       expect(feedsState.data.orders).toHaveLength(0);
     });
   });
@@ -74,11 +74,11 @@ describe('feed-slice', () => {
         name: 'burger1',
         createdAt: '2024-10-01T00:00:00Z',
         updatedAt: '2024-10-01T01:00:00Z',
-        ingredients: ['1', '2', '3'],
+        ingredients: ['1', '2', '3']
       };
 
       (getOrderByNumberApi as jest.Mock).mockResolvedValue({
-        orders: [mockOrderData],
+        orders: [mockOrderData]
       });
 
       await store.dispatch(getFeedById(1001) as any);
@@ -91,7 +91,7 @@ describe('feed-slice', () => {
     });
 
     it('должен обрабатывать состояние "rejected", когда вызов API завершается с ошибкой', async () => {
-      const errorMessage = 'Не удалось получить order'; 
+      const errorMessage = 'Не удалось получить order';
       const mockError = new Error(errorMessage);
 
       (getOrderByNumberApi as jest.Mock).mockRejectedValue(mockError);
@@ -101,7 +101,7 @@ describe('feed-slice', () => {
       const state = store.getState() as RootState;
       const feedsState = state.feeds;
       expect(feedsState.loading).toBe(false);
-      expect(feedsState.error).toBe(errorMessage); 
+      expect(feedsState.error).toBe(errorMessage);
       expect(feedsState.order).toBeNull();
     });
   });
